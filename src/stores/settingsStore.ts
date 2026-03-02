@@ -397,6 +397,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
     useSettingsStore.setState({ agentKey: key });
     if (isBrowser) {
       window.electronAPI?.notifyAgentHotkeyChanged?.(key);
+      window.electronAPI?.saveAgentKey?.(key);
     }
   },
   setAgentSystemPrompt: createStringSetter("agentSystemPrompt"),
@@ -554,6 +555,20 @@ export async function initializeSettings(): Promise<void> {
     } catch (err) {
       logger.warn(
         "Failed to sync dictation key on startup",
+        { error: (err as Error).message },
+        "settings"
+      );
+    }
+
+    // Sync agent key from main process
+    try {
+      const envKey = await window.electronAPI.getAgentKey?.();
+      if (envKey && envKey !== state.agentKey) {
+        createStringSetter("agentKey")(envKey);
+      }
+    } catch (err) {
+      logger.warn(
+        "Failed to sync agent key on startup",
         { error: (err as Error).message },
         "settings"
       );
