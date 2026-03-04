@@ -287,7 +287,11 @@ function initializeCoreManagers() {
 // Phase 2: Non-critical setup after windows are visible
 function initializeDeferredManagers() {
   ensureYdotool().catch((err) => {
-    require("./src/helpers/debugLogger").warn("ydotool setup error", { error: err?.message }, "clipboard");
+    require("./src/helpers/debugLogger").warn(
+      "ydotool setup error",
+      { error: err?.message },
+      "clipboard"
+    );
   });
   clipboardManager.preWarmAccessibility();
   trayManager = new TrayManager();
@@ -544,8 +548,10 @@ async function startApp() {
   ipcMain.on("agent-hotkey-changed", (_event, hotkey) => {
     if (hotkey) {
       hotkeyManager.registerSlot("agent", hotkey, agentHotkeyCallback);
+      environmentManager.saveAgentKey(hotkey);
     } else {
       hotkeyManager.unregisterSlot("agent");
+      environmentManager.saveAgentKey("");
     }
   });
 

@@ -4,7 +4,6 @@ import { Loader2, Plus, X } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { useSettingsStore } from "../stores/settingsStore";
-import { useUsage } from "../hooks/useUsage";
 import googleCalendarIcon from "../assets/icons/google-calendar.svg";
 
 function SettingsPanel({ children }: { children: React.ReactNode }) {
@@ -15,34 +14,15 @@ function SettingsPanel({ children }: { children: React.ReactNode }) {
   );
 }
 
-function SettingsPanelRow({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return <div className={`px-4 py-3 ${className}`}>{children}</div>;
+function SettingsPanelRow({ children }: { children: React.ReactNode }) {
+  return <div className="px-4 py-3">{children}</div>;
 }
-
-const PLAN_TIERS = [
-  { nameKey: "integrations.plan.free", limitKey: "integrations.plan.freeLimit", id: "free" },
-  {
-    nameKey: "integrations.plan.essential",
-    limitKey: "integrations.plan.essentialLimit",
-    id: "essential",
-  },
-  { nameKey: "integrations.plan.pro", limitKey: "integrations.plan.proLimit", id: "pro" },
-] as const;
 
 export default function IntegrationsView() {
   const { t } = useTranslation();
   const { gcalAccounts, setGcalAccounts } = useSettingsStore();
   const [isConnecting, setIsConnecting] = useState(false);
   const [disconnectingEmail, setDisconnectingEmail] = useState<string | null>(null);
-  const usage = useUsage();
-
-  const currentPlan = usage?.isSubscribed ? "pro" : usage?.isTrial ? "essential" : "free";
   const hasAccounts = gcalAccounts.length > 0;
 
   const handleConnect = useCallback(async () => {
@@ -179,33 +159,6 @@ export default function IntegrationsView() {
             </button>
           </SettingsPanelRow>
         )}
-      </SettingsPanel>
-
-      <SettingsPanel>
-        <SettingsPanelRow>
-          <p className="text-xs font-semibold text-foreground">{t("integrations.plan.title")}</p>
-        </SettingsPanelRow>
-        {PLAN_TIERS.map((tier) => {
-          const isCurrent = tier.id === currentPlan;
-          return (
-            <SettingsPanelRow
-              key={tier.id}
-              className={isCurrent ? "bg-primary/5 dark:bg-primary/8" : ""}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-foreground">{t(tier.nameKey)}</span>
-                  {isCurrent && (
-                    <Badge variant="default" className="text-[10px] px-1.5 py-0">
-                      {t("integrations.plan.current")}
-                    </Badge>
-                  )}
-                </div>
-                <span className="text-xs text-muted-foreground">{t(tier.limitKey)}</span>
-              </div>
-            </SettingsPanelRow>
-          );
-        })}
       </SettingsPanel>
     </div>
   );
