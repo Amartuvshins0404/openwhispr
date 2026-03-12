@@ -2688,12 +2688,12 @@ class IPCHandlers {
       }
     };
 
-    ipcMain.handle("cloud-checkout", (event, plan) =>
+    ipcMain.handle("cloud-checkout", (event, opts) =>
       fetchStripeUrl(
         event,
         "/api/stripe/checkout",
         "Cloud checkout error",
-        plan ? { plan } : undefined
+        opts || undefined
       )
     );
 

@@ -919,6 +919,7 @@
         "limitReached": "Limit reached",
         "pastDue": "Past due",
         "pro": "Pro",
+        "business": "Business",
         "trial": "Trial"
       },
       "billing": {
@@ -955,25 +956,24 @@
       "planLabels": {
         "free": "Free",
         "pro": "Pro",
+        "business": "Business",
         "trial": "Trial"
       },
       "planTitle": "Plan",
       "pricing": {
         "title": "Plans",
-        "monthly": "Monthly",
-        "annual": "Annual",
-        "annualBadge": "Save 17%",
+        "billedYearly": "Billed yearly",
         "free": {
           "name": "Free",
           "price": "$0",
           "period": "forever",
           "features": [
-            "2,000 words/week",
-            "Local AI models",
-            "Bring your own keys",
-            "Dictionary and snippets",
-            "Support for 100+ languages",
-            "Zero data retention"
+            "Up to 2,000 words/week",
+            "5 hours of meetings per month",
+            "Local AI models included",
+            "Bring your own API keys",
+            "Zero data retention",
+            "Community support"
           ]
         },
         "pro": {
@@ -982,14 +982,31 @@
           "monthlyPeriod": "/mo",
           "annualPrice": "$80",
           "annualPeriod": "/yr",
+          "annualEquivalent": "$6.67",
+          "includesPrefix": "All Free features +",
           "features": [
-            "Everything in Free",
+            "Unlimited words per week",
+            "20 hours of meetings per month",
+            "Email support",
+            "Zero data retention"
+          ],
+          "cta": "Get Started",
+          "switchToAnnual": "Switch to Annual"
+        },
+        "business": {
+          "name": "Business",
+          "monthlyPrice": "$20",
+          "monthlyPeriod": "/mo",
+          "annualPrice": "$200",
+          "annualPeriod": "/yr",
+          "annualEquivalent": "$16.67",
+          "includesPrefix": "All Pro features +",
+          "badge": "Most Popular",
+          "features": [
             "Unlimited usage",
-            "Real-time transcription",
-            "Latest audio & AI models",
-            "iOS/Android (coming soon)",
-            "Zero data retention",
-            "Priority support"
+            "Unlimited meeting recordings",
+            "Priority support",
+            "Zero data retention"
           ],
           "cta": "Get Started",
           "switchToAnnual": "Switch to Annual"
@@ -997,7 +1014,14 @@
         "enterprise": {
           "name": "Enterprise",
           "price": "Custom",
-          "features": ["Cloud sync", "Team features (coming soon)", "SSO & compliance"],
+          "subtitle": "Annual billing only",
+          "includesPrefix": "All Business features +",
+          "features": [
+            "Managed API credits",
+            "Cloud sync across devices",
+            "Team features & admin",
+            "SSO & compliance"
+          ],
           "cta": "Contact Us"
         },
         "currentPlan": "Current plan"
@@ -1515,6 +1539,7 @@
     "trial": "Trial ({{days}} day left)",
     "trial_other": "Trial ({{days}} days left)",
     "pro": "Pro",
+    "business": "Business",
     "unlimitedTrial": "Unlimited transcriptions during your trial",
     "unlimited": "Unlimited transcriptions",
     "manageSubscription": "Manage Subscription",

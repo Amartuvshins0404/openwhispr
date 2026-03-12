@@ -861,6 +861,7 @@
         "limitReached": "已達上限",
         "pastDue": "款項逾期",
         "pro": "Pro",
+        "business": "Business",
         "trial": "試用"
       },
       "billing": {
@@ -897,6 +898,7 @@
       "planLabels": {
         "free": "免費",
         "pro": "Pro",
+        "business": "Business",
         "trial": "試用"
       },
       "planTitle": "方案",
@@ -922,20 +924,18 @@
       },
       "pricing": {
         "title": "方案",
-        "monthly": "月付",
-        "annual": "年付",
-        "annualBadge": "省 17%",
+        "billedYearly": "按年計費",
         "free": {
-          "name": "免費",
+          "name": "Free",
           "price": "$0",
           "period": "永久",
           "features": [
-            "每週 2,000 字",
-            "本機 AI 模型",
-            "自備 API Key",
-            "字典與片段",
-            "支援 100+ 種語言",
-            "零資料留存"
+            "Up to 2,000 words/week",
+            "5 hours of meetings per month",
+            "Local AI models included",
+            "Bring your own API keys",
+            "Zero data retention",
+            "Community support"
           ]
         },
         "pro": {
@@ -944,22 +944,46 @@
           "monthlyPeriod": "/月",
           "annualPrice": "$80",
           "annualPeriod": "/年",
+          "annualEquivalent": "$6.67",
+          "includesPrefix": "所有 Free 功能 +",
           "features": [
-            "包含免費版所有功能",
-            "無限使用",
-            "即時轉錄",
-            "最新音訊與 AI 模型",
-            "iOS/Android（即將推出）",
-            "零資料留存",
-            "優先支援"
+            "Unlimited words per week",
+            "20 hours of meetings per month",
+            "Email support",
+            "Zero data retention"
+          ],
+          "cta": "開始使用",
+          "switchToAnnual": "切換為年付"
+        },
+        "business": {
+          "name": "Business",
+          "monthlyPrice": "$20",
+          "monthlyPeriod": "/月",
+          "annualPrice": "$200",
+          "annualPeriod": "/年",
+          "annualEquivalent": "$16.67",
+          "includesPrefix": "所有 Pro 功能 +",
+          "badge": "最熱門",
+          "features": [
+            "Unlimited usage",
+            "Unlimited meeting recordings",
+            "Priority support",
+            "Zero data retention"
           ],
           "cta": "開始使用",
           "switchToAnnual": "切換為年付"
         },
         "enterprise": {
-          "name": "企業版",
+          "name": "Enterprise",
           "price": "自訂",
-          "features": ["雲端同步", "團隊功能（即將推出）", "SSO 與合規"],
+          "subtitle": "僅限年付",
+          "includesPrefix": "所有 Business 功能 +",
+          "features": [
+            "Managed API credits",
+            "Cloud sync across devices",
+            "Team features & admin",
+            "SSO & compliance"
+          ],
           "cta": "聯絡我們"
         },
         "currentPlan": "目前方案"
@@ -1623,6 +1647,7 @@
     "trial": "試用（剩餘 {{days}} 天）",
     "trial_other": "試用（剩餘 {{days}} 天）",
     "pro": "Pro",
+    "business": "Business",
     "unlimitedTrial": "試用期間無限轉錄",
     "unlimited": "無限轉錄",
     "manageSubscription": "管理訂閱",

@@ -861,6 +861,7 @@
         "limitReached": "Limite atteinte",
         "pastDue": "Paiement en retard",
         "pro": "Pro",
+        "business": "Business",
         "trial": "Essai"
       },
       "billing": {
@@ -897,25 +898,24 @@
       "planLabels": {
         "free": "Gratuit",
         "pro": "Pro",
+        "business": "Business",
         "trial": "Essai"
       },
       "planTitle": "Plan",
       "pricing": {
         "title": "Forfaits",
-        "monthly": "Mensuel",
-        "annual": "Annuel",
-        "annualBadge": "Économisez 17 %",
+        "billedYearly": "Facturation annuelle",
         "free": {
-          "name": "Gratuit",
+          "name": "Free",
           "price": "$0",
           "period": "pour toujours",
           "features": [
-            "2 000 mots/semaine",
-            "Modèles IA locaux",
-            "Apportez vos propres clés",
-            "Dictionnaire et extraits",
-            "Prise en charge de plus de 100 langues",
-            "Aucune rétention de données"
+            "Up to 2,000 words/week",
+            "5 hours of meetings per month",
+            "Local AI models included",
+            "Bring your own API keys",
+            "Zero data retention",
+            "Community support"
           ]
         },
         "pro": {
@@ -924,29 +924,49 @@
           "monthlyPeriod": "/mois",
           "annualPrice": "$80",
           "annualPeriod": "/an",
+          "annualEquivalent": "$6.67",
+          "includesPrefix": "Toutes les fonctionnalités Free +",
           "features": [
-            "Tout ce qui est dans Gratuit",
-            "Utilisation illimitée",
-            "Transcription en temps réel",
-            "Derniers modèles audio & IA",
-            "iOS/Android (bientôt)",
-            "Aucune rétention de données",
-            "Support prioritaire"
+            "Unlimited words per week",
+            "20 hours of meetings per month",
+            "Email support",
+            "Zero data retention"
+          ],
+          "cta": "Commencer",
+          "switchToAnnual": "Passer à l'annuel"
+        },
+        "business": {
+          "name": "Business",
+          "monthlyPrice": "$20",
+          "monthlyPeriod": "/mois",
+          "annualPrice": "$200",
+          "annualPeriod": "/an",
+          "annualEquivalent": "$16.67",
+          "includesPrefix": "Toutes les fonctionnalités Pro +",
+          "badge": "Le plus populaire",
+          "features": [
+            "Unlimited usage",
+            "Unlimited meeting recordings",
+            "Priority support",
+            "Zero data retention"
           ],
           "cta": "Commencer",
           "switchToAnnual": "Passer à l'annuel"
         },
         "enterprise": {
-          "name": "Entreprise",
+          "name": "Enterprise",
           "price": "Sur devis",
+          "subtitle": "Facturation annuelle uniquement",
+          "includesPrefix": "Toutes les fonctionnalités Business +",
           "features": [
-            "Synchronisation cloud",
-            "Fonctionnalités d'équipe (bientôt)",
-            "SSO & conformité"
+            "Managed API credits",
+            "Cloud sync across devices",
+            "Team features & admin",
+            "SSO & compliance"
           ],
           "cta": "Nous contacter"
         },
-        "currentPlan": "Plan actuel"
+        "currentPlan": "Forfait actuel"
       },
       "rollingWeeklyLimit": "Limite hebdomadaire glissante",
       "signOut": {
@@ -1443,6 +1463,7 @@
     "trial": "Essai ({{days}} jour restant)",
     "trial_other": "Essai ({{days}} jours restants)",
     "pro": "Pro",
+    "business": "Business",
     "unlimitedTrial": "Transcriptions illimitées pendant votre période d'essai",
     "unlimited": "Transcriptions illimitées",
     "manageSubscription": "Gérer l'abonnement",

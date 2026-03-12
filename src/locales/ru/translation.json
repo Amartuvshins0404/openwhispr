@@ -861,6 +861,7 @@
         "limitReached": "Лимит достигнут",
         "pastDue": "Просрочен",
         "pro": "Pro",
+        "business": "Business",
         "trial": "Пробный"
       },
       "billing": {
@@ -897,6 +898,7 @@
       "planLabels": {
         "free": "Бесплатный",
         "pro": "Pro",
+        "business": "Business",
         "trial": "Пробный"
       },
       "planTitle": "Тариф",
@@ -922,20 +924,18 @@
       },
       "pricing": {
         "title": "Тарифы",
-        "monthly": "Ежемесячно",
-        "annual": "Ежегодно",
-        "annualBadge": "Скидка 17%",
+        "billedYearly": "Годовая оплата",
         "free": {
-          "name": "Бесплатный",
+          "name": "Free",
           "price": "$0",
           "period": "навсегда",
           "features": [
-            "2 000 слов/неделя",
-            "Локальные модели ИИ",
-            "Свои API-ключи",
-            "Словарь и сниппеты",
-            "Поддержка 100+ языков",
-            "Без хранения данных"
+            "Up to 2,000 words/week",
+            "5 hours of meetings per month",
+            "Local AI models included",
+            "Bring your own API keys",
+            "Zero data retention",
+            "Community support"
           ]
         },
         "pro": {
@@ -944,25 +944,45 @@
           "monthlyPeriod": "/мес.",
           "annualPrice": "$80",
           "annualPeriod": "/год",
+          "annualEquivalent": "$6.67",
+          "includesPrefix": "Все функции Free +",
           "features": [
-            "Всё из Бесплатного",
-            "Безлимитное использование",
-            "Транскрипция в реальном времени",
-            "Новейшие аудио- и ИИ-модели",
-            "iOS/Android (скоро)",
-            "Без хранения данных",
-            "Приоритетная поддержка"
+            "Unlimited words per week",
+            "20 hours of meetings per month",
+            "Email support",
+            "Zero data retention"
+          ],
+          "cta": "Начать",
+          "switchToAnnual": "Перейти на годовой"
+        },
+        "business": {
+          "name": "Business",
+          "monthlyPrice": "$20",
+          "monthlyPeriod": "/мес.",
+          "annualPrice": "$200",
+          "annualPeriod": "/год",
+          "annualEquivalent": "$16.67",
+          "includesPrefix": "Все функции Pro +",
+          "badge": "Самый популярный",
+          "features": [
+            "Unlimited usage",
+            "Unlimited meeting recordings",
+            "Priority support",
+            "Zero data retention"
           ],
           "cta": "Начать",
           "switchToAnnual": "Перейти на годовой"
         },
         "enterprise": {
-          "name": "Корпоративный",
+          "name": "Enterprise",
           "price": "Индивидуально",
+          "subtitle": "Только годовая оплата",
+          "includesPrefix": "Все функции Business +",
           "features": [
-            "Облачная синхронизация",
-            "Командные функции (скоро)",
-            "SSO и соответствие требованиям"
+            "Managed API credits",
+            "Cloud sync across devices",
+            "Team features & admin",
+            "SSO & compliance"
           ],
           "cta": "Связаться с нами"
         },
@@ -1627,6 +1647,7 @@
     "trial": "Пробный период ({{days}} дн.)",
     "trial_other": "Пробный период ({{days}} дн.)",
     "pro": "Pro",
+    "business": "Business",
     "unlimitedTrial": "Без ограничений в пробный период",
     "unlimited": "Без ограничений",
     "manageSubscription": "Управление подпиской",

@@ -37,7 +37,7 @@ interface UseUsageResult {
   error: string | null;
   checkoutLoading: boolean;
   refetch: () => Promise<void>;
-  openCheckout: (plan?: "monthly" | "annual") => Promise<{ success: boolean; error?: string }>;
+  openCheckout: (opts?: { plan?: "monthly" | "annual"; tier?: "pro" | "business" }) => Promise<{ success: boolean; error?: string }>;
   openBillingPortal: () => Promise<{ success: boolean; error?: string }>;
 }
 
@@ -124,7 +124,7 @@ export function useUsage(): UseUsageResult | null {
   }, [isLoaded, isSignedIn, fetchUsage]);
 
   const openCheckout = useCallback(
-    async (plan?: "monthly" | "annual"): Promise<{ success: boolean; error?: string }> => {
+    async (opts?: { plan?: "monthly" | "annual"; tier?: "pro" | "business" }): Promise<{ success: boolean; error?: string }> => {
       if (checkoutInFlightRef.current)
         return { success: false, error: "Checkout already in progress" };
       if (!window.electronAPI?.cloudCheckout || !window.electronAPI?.openExternal) {
@@ -133,7 +133,7 @@ export function useUsage(): UseUsageResult | null {
       checkoutInFlightRef.current = true;
       setCheckoutLoading(true);
       try {
-        const result = await window.electronAPI.cloudCheckout(plan);
+        const result = await window.electronAPI.cloudCheckout(opts);
         if (result.success && result.url) {
           pendingRefetchRef.current = true;
           await window.electronAPI.openExternal(result.url);

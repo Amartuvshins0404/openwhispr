@@ -819,7 +819,7 @@ declare global {
         error?: string;
         code?: string;
       }>;
-      cloudCheckout?: (plan?: "monthly" | "annual") => Promise<{
+      cloudCheckout?: (opts?: { plan?: "monthly" | "annual"; tier?: "pro" | "business" }) => Promise<{
         success: boolean;
         url?: string;
         error?: string;
