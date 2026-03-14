@@ -508,8 +508,6 @@ class ReasoningService extends BaseReasoningService {
         { role: "user", content: userPrompt },
       ];
 
-      const isOlderModel = model && (model.startsWith("gpt-4") || model.startsWith("gpt-3"));
-
       const openAiBase = this.getConfiguredOpenAIBase();
       const endpointCandidates = this.getOpenAIEndpointCandidates(openAiBase);
       const isCustomEndpoint = openAiBase !== API_ENDPOINTS.OPENAI_BASE;
@@ -538,15 +536,31 @@ class ReasoningService extends BaseReasoningService {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 30000);
           try {
+            const maxTokens =
+              config.maxTokens ||
+              Math.max(
+                4096,
+                this.calculateMaxTokens(
+                  text.length,
+                  TOKEN_LIMITS.MIN_TOKENS,
+                  TOKEN_LIMITS.MAX_TOKENS,
+                  TOKEN_LIMITS.TOKEN_MULTIPLIER
+                )
+              );
+
             const requestBody: any = { model };
 
             if (type === "responses") {
               requestBody.input = messages;
               requestBody.store = false;
+              requestBody.max_output_tokens = maxTokens;
             } else {
               requestBody.messages = messages;
-              if (isOlderModel) {
+              if (this.isOlderOpenAiModel(model)) {
                 requestBody.temperature = config.temperature || 0.3;
+                requestBody.max_tokens = maxTokens;
+              } else {
+                requestBody.max_completion_tokens = maxTokens;
               }
             }
 
@@ -1076,6 +1090,18 @@ class ReasoningService extends BaseReasoningService {
     }
   }
 
+  // Returns true for legacy OpenAI Chat Completions models that use max_tokens and temperature.
+  // Newer models (gpt-4.1+, gpt-5+) require max_completion_tokens and reject temperature.
+  private isOlderOpenAiModel(model: string): boolean {
+    if (!model) return false;
+    return (
+      model.startsWith("gpt-3") ||
+      model.startsWith("gpt-4o") ||
+      model.startsWith("gpt-4-") ||
+      model === "gpt-4"
+    );
+  }
+
   private getCustomPrompt(): string | undefined {
     try {
       const raw = localStorage.getItem("customUnifiedPrompt");
@@ -1124,13 +1150,23 @@ class ReasoningService extends BaseReasoningService {
       }
     }
 
+    const useOldTokenParam =
+      isLocalProvider || provider === "groq" || this.isOlderOpenAiModel(model);
+
     const requestBody: Record<string, unknown> = {
       model,
       messages,
       stream: true,
-      temperature: config.temperature ?? 0.3,
-      max_tokens: config.maxTokens || Math.max(4096, TOKEN_LIMITS.MAX_TOKENS),
     };
+
+    const maxTokens = config.maxTokens || Math.max(4096, TOKEN_LIMITS.MAX_TOKENS);
+    
+    if (useOldTokenParam) {
+      requestBody.temperature = config.temperature ?? 0.3;
+      requestBody.max_tokens = maxTokens;
+    } else {
+      requestBody.max_completion_tokens = maxTokens;
+    }
 
     logger.logReasoning("AGENT_STREAM_REQUEST", {
       endpoint,
