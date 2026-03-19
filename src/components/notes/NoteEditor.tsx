@@ -381,8 +381,17 @@ export default function NoteEditor({
     const raw = note.transcript || "";
     if (raw.startsWith("[")) {
       try {
-        const parsed = JSON.parse(raw) as Array<{ text: string; source: "mic" | "system" }>;
-        return parsed.map((s, i) => ({ id: `stored-${i}`, text: s.text, source: s.source }));
+        const parsed = JSON.parse(raw) as Array<{
+          text: string;
+          source: "mic" | "system";
+          timestamp?: number;
+        }>;
+        return parsed.map((s, i) => ({
+          id: `stored-${i}`,
+          text: s.text,
+          source: s.source,
+          timestamp: s.timestamp,
+        }));
       } catch {}
     }
     return [];

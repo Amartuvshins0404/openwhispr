@@ -413,7 +413,9 @@ export default function PersonalNotesView({
     ) {
       const transcript =
         meetingSegments.length > 0
-          ? JSON.stringify(meetingSegments.map(({ text, source }) => ({ text, source })))
+          ? JSON.stringify(
+              meetingSegments.map(({ text, source, timestamp }) => ({ text, source, timestamp }))
+            )
           : meetingTranscript;
       window.electronAPI.updateNote(meetingNoteIdRef.current, {
         transcript,
@@ -796,9 +798,7 @@ export default function PersonalNotesView({
 
                     const parts = [
                       hasNotes ? localContent : "",
-                      formattedTranscript
-                        ? `## Meeting Transcript\n${formattedTranscript}`
-                        : "",
+                      formattedTranscript ? `## Meeting Transcript\n${formattedTranscript}` : "",
                     ]
                       .filter(Boolean)
                       .join("\n\n");
