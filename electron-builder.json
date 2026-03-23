@@ -86,6 +86,7 @@
   "extraResources": [
     ".env",
     "src/assets/**/*",
+    "resources/bin/macos-audio-tap",
     "resources/bin/macos-globe-listener",
     "resources/bin/macos-fast-paste",
     "resources/bin/macos-mic-listener",

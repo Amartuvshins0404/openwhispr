@@ -115,6 +115,13 @@ export interface AudioDiagnosticsResult {
   models: string[];
 }
 
+export interface SystemAudioAccessResult {
+  granted: boolean;
+  status: "granted" | "denied" | "unknown" | "unsupported";
+  mode: "native" | "legacy" | "unsupported";
+  error?: string;
+}
+
 export interface UpdateCheckResult {
   updateAvailable: boolean;
   version?: string;
@@ -732,7 +739,8 @@ declare global {
 
       // System settings helpers
       requestMicrophoneAccess?: () => Promise<{ granted: boolean }>;
-      checkSystemAudioAccess?: () => Promise<{ granted: boolean }>;
+      checkSystemAudioAccess?: () => Promise<SystemAudioAccessResult>;
+      requestSystemAudioAccess?: () => Promise<SystemAudioAccessResult>;
       openMicrophoneSettings?: () => Promise<{ success: boolean; error?: string }>;
       openSoundInputSettings?: () => Promise<{ success: boolean; error?: string }>;
       openAccessibilitySettings?: () => Promise<{ success: boolean; error?: string }>;
@@ -1126,7 +1134,7 @@ declare global {
         provider?: string;
         model?: string;
         language?: string;
-      }) => Promise<{ success: boolean; error?: string }>;
+      }) => Promise<{ success: boolean; error?: string; systemAudioMode?: "native" | "legacy" }>;
       meetingTranscriptionSend?: (buffer: ArrayBuffer, source: "mic" | "system") => void;
       meetingTranscriptionStop?: () => Promise<{
         success: boolean;
@@ -1188,6 +1196,15 @@ declare global {
       onNavigateToMeetingNote?: (
         callback: (data: { noteId: number; folderId: number; event: any }) => void
       ) => () => void;
+      onUpdateNotificationData?: (
+        callback: (data: { version: string; releaseDate?: string }) => void
+      ) => () => void;
+      getUpdateNotificationData?: () => Promise<{
+        version: string;
+        releaseDate?: string;
+      } | null>;
+      updateNotificationReady?: () => Promise<void>;
+      updateNotificationRespond?: (action: string) => Promise<{ success: boolean }>;
     };
 
     api?: {

@@ -361,9 +361,8 @@ export function useMeetingTranscription(): UseMeetingTranscriptionReturn {
     try {
       const startTime = performance.now();
 
-      const [startResult, stream, micResult] = await Promise.all([
+      const [startResult, micResult] = await Promise.all([
         window.electronAPI?.meetingTranscriptionStart?.(getMeetingTranscriptionOptions()),
-        getSystemAudioStream(),
         getMeetingMicConstraints().then((constraints) =>
           navigator.mediaDevices.getUserMedia(constraints).catch((err) => {
             logger.error(
@@ -377,6 +376,8 @@ export function useMeetingTranscription(): UseMeetingTranscriptionReturn {
       ]);
 
       const streamsMs = performance.now() - startTime;
+      const systemAudioMode = startResult?.systemAudioMode || "legacy";
+      const stream = systemAudioMode === "legacy" ? await getSystemAudioStream() : null;
 
       // Abort if stop was called during setup
       if (!isRecordingRef.current) {
@@ -401,7 +402,7 @@ export function useMeetingTranscription(): UseMeetingTranscriptionReturn {
         return;
       }
 
-      if (!stream) {
+      if (systemAudioMode === "legacy" && !stream) {
         logger.error("Could not capture system audio for meeting transcription", {}, "meeting");
         micResult?.getTracks().forEach((track) => track.stop());
         await window.electronAPI?.meetingTranscriptionStop?.();
@@ -410,7 +411,9 @@ export function useMeetingTranscription(): UseMeetingTranscriptionReturn {
         setIsRecording(false);
         return;
       }
-      streamRef.current = stream;
+      if (stream) {
+        streamRef.current = stream;
+      }
 
       const partialSetters = { mic: setMicPartial, system: setSystemPartial };
 
@@ -469,49 +472,50 @@ export function useMeetingTranscription(): UseMeetingTranscriptionReturn {
       const pendingMicChunks: ArrayBuffer[] = [];
       let socketReady = false;
 
-      // Use the loopback stream's native sample rate for the system AudioContext.
-      // System audio loopback produces silence when forced through a 24kHz
-      // AudioContext — the resampling path differs from getUserMedia and doesn't
-      // work correctly for loopback sources.
-      const loopbackRate = stream.getAudioTracks()[0]?.getSettings()?.sampleRate || 48000;
-      const systemNeedsResample = loopbackRate !== 24000;
-      const audioContext = new AudioContext({ sampleRate: loopbackRate });
-      await detachFromOutputDevice(audioContext);
-      audioContextRef.current = audioContext;
+      let systemPipelinePromise: Promise<{
+        source: MediaStreamAudioSourceNode;
+        processor: AudioWorkletNode;
+      }> | null = null;
+      if (stream) {
+        const loopbackRate = stream.getAudioTracks()[0]?.getSettings()?.sampleRate || 48000;
+        const systemNeedsResample = loopbackRate !== 24000;
+        const audioContext = new AudioContext({ sampleRate: loopbackRate });
+        await detachFromOutputDevice(audioContext);
+        audioContextRef.current = audioContext;
 
-      logger.debug(
-        "System audio context created",
-        { loopbackRate, needsResample: systemNeedsResample },
-        "meeting"
-      );
+        logger.debug(
+          "System audio context created",
+          { loopbackRate, needsResample: systemNeedsResample },
+          "meeting"
+        );
 
-      const systemPipelinePromise = createAudioPipeline({
-        stream,
-        context: audioContext,
-        label: "Meeting system",
-        onChunk: (chunk) => {
-          if (!isRecordingRef.current) return;
-          let samples = new Int16Array(chunk);
+        systemPipelinePromise = createAudioPipeline({
+          stream,
+          context: audioContext,
+          label: "Meeting system",
+          onChunk: (chunk) => {
+            if (!isRecordingRef.current) return;
+            let samples = new Int16Array(chunk);
 
-          // Downsample to 24kHz for the OpenAI Realtime API
-          if (systemNeedsResample) {
-            const ratio = loopbackRate / 24000;
-            const outLen = Math.floor(samples.length / ratio);
-            const out = new Int16Array(outLen);
-            for (let i = 0; i < outLen; i++) {
-              out[i] = samples[Math.round(i * ratio)];
+            if (systemNeedsResample) {
+              const ratio = loopbackRate / 24000;
+              const outLen = Math.floor(samples.length / ratio);
+              const out = new Int16Array(outLen);
+              for (let i = 0; i < outLen; i++) {
+                out[i] = samples[Math.round(i * ratio)];
+              }
+              samples = out;
             }
-            samples = out;
-          }
 
-          const buf = samples.buffer;
-          if (socketReady) {
-            window.electronAPI?.meetingTranscriptionSend?.(buf, "system");
-            return;
-          }
-          pendingSystemChunks.push(buf.slice(0) as ArrayBuffer);
-        },
-      });
+            const buf = samples.buffer;
+            if (socketReady) {
+              window.electronAPI?.meetingTranscriptionSend?.(buf, "system");
+              return;
+            }
+            pendingSystemChunks.push(buf.slice(0) as ArrayBuffer);
+          },
+        });
+      }
 
       let micPipelinePromise: Promise<void> | null = null;
       if (micResult) {
@@ -583,6 +587,7 @@ export function useMeetingTranscription(): UseMeetingTranscriptionReturn {
       logger.info(
         "Meeting transcription started successfully",
         {
+          systemAudioMode,
           bufferedChunks: pendingSystemChunks.length + pendingMicChunks.length,
           streamsMs: Math.round(streamsMs),
           totalMs: Math.round(totalMs),

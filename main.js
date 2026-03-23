@@ -198,6 +198,7 @@ const WhisperCudaManager = require("./src/helpers/whisperCudaManager");
 const GoogleCalendarManager = require("./src/helpers/googleCalendarManager");
 const MeetingProcessDetector = require("./src/helpers/meetingProcessDetector");
 const AudioActivityDetector = require("./src/helpers/audioActivityDetector");
+const AudioTapManager = require("./src/helpers/audioTapManager");
 const MeetingDetectionEngine = require("./src/helpers/meetingDetectionEngine");
 const { i18nMain, changeLanguage } = require("./src/helpers/i18nMain");
 const { ensureYdotool } = require("./src/helpers/ensureYdotool");
@@ -219,6 +220,7 @@ let textEditMonitor = null;
 let whisperCudaManager = null;
 let googleCalendarManager = null;
 let meetingDetectionEngine = null;
+let audioTapManager = null;
 let ipcHandlers = null;
 let globeKeyAlertShown = false;
 let authBridgeServer = null;
@@ -295,6 +297,7 @@ function initializeCoreManagers() {
   updateManager.setWindowManager(windowManager);
   windowsKeyManager = new WindowsKeyManager();
   textEditMonitor = new TextEditMonitor();
+  audioTapManager = new AudioTapManager();
   windowManager.textEditMonitor = textEditMonitor;
 
   // IPC handlers must be registered before window content loads
@@ -311,6 +314,7 @@ function initializeCoreManagers() {
     whisperCudaManager,
     googleCalendarManager,
     meetingDetectionEngine,
+    audioTapManager,
     getTrayManager: () => trayManager,
   });
 }
@@ -1150,6 +1154,9 @@ if (gotSingleInstanceLock) {
     }
     if (googleCalendarManager) {
       googleCalendarManager.stop();
+    }
+    if (audioTapManager) {
+      audioTapManager.stop().catch(() => {});
     }
     if (ipcHandlers) {
       ipcHandlers._cleanupTextEditMonitor();
