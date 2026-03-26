@@ -35,7 +35,7 @@ class WindowManager {
     this._cachedActivationMode = "tap";
     this._floatingIconAutoHide = false;
     this._agentAnimationState = null;
-    this._panelStartPosition = "bottom-right";
+    this._panelStartPosition = "center";
     this._isDictatingToggle = false;
 
     app.on("before-quit", () => {
@@ -458,7 +458,8 @@ class WindowManager {
   }
 
   setPanelStartPosition(position) {
-    this._panelStartPosition = position || "bottom-right";
+    // Always center the pill overlay at bottom of screen
+    this._panelStartPosition = "center";
     // Reposition the window immediately
     if (this.mainWindow && !this.mainWindow.isDestroyed()) {
       const currentBounds = this.mainWindow.getBounds();
@@ -868,11 +869,15 @@ class WindowManager {
   showDictationPanel(options = {}) {
     const { focus = false } = options;
     if (this.mainWindow && !this.mainWindow.isDestroyed()) {
-      const wasHidden = !this.mainWindow.isVisible() || this.mainWindow.isMinimized();
-
-      if (wasHidden) {
-        this._repositionToCursorDisplay();
-      }
+      // Always reposition to bottom-center of current display
+      const cursorPos = screen.getCursorScreenPoint();
+      const display = screen.getDisplayNearestPoint(cursorPos);
+      const newPos = WindowPositionUtil.getMainWindowPosition(
+        display,
+        null,
+        "center"
+      );
+      this.mainWindow.setBounds(newPos);
 
       if (this.mainWindow.isMinimized()) {
         this.mainWindow.restore();

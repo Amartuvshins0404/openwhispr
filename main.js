@@ -86,7 +86,7 @@ if (process.platform === "linux" && process.env.XDG_SESSION_TYPE === "wayland") 
   } else {
     app.commandLine.appendSwitch("ozone-platform-hint", "auto");
   }
-  app.commandLine.appendSwitch("enable-features", "UseOzonePlatform,WaylandWindowDecorations");
+  app.commandLine.appendSwitch("enable-features", "UseOzonePlatform");
 }
 
 // Set desktop filename so Wayland compositors can match windows to the .desktop entry.

@@ -584,27 +584,45 @@ class ClipboardManager {
         }
 
         if (!isAsciiOnly && hasYdotool && this.commandExists("wl-copy")) {
-          // Non-ASCII (Cyrillic, CJK): wl-copy to clipboard, then ydotool Ctrl+Shift+V (terminal paste)
+          // Non-ASCII (Cyrillic, CJK): wl-copy + ydotool single Ctrl+Shift+V, then restore clipboard
           this.safeLog("⚡ Using wl-copy + ydotool paste (non-ASCII)");
+
+          // Save clipboard MIME type and text content (skip binary like images)
+          let savedClipboardText = null;
+          let clipboardWasText = false;
+          try {
+            const mimeCheck = spawnSync("wl-paste", ["--list-types"], { timeout: 500, encoding: "utf-8" });
+            const mimeTypes = mimeCheck.status === 0 ? mimeCheck.stdout : "";
+            clipboardWasText = mimeTypes.includes("text/plain") || mimeTypes.includes("STRING");
+            if (clipboardWasText) {
+              const saved = spawnSync("wl-paste", ["--no-newline", "-t", "text/plain"], { timeout: 500, encoding: "utf-8" });
+              if (saved.status === 0) savedClipboardText = saved.stdout;
+            }
+          } catch {}
+
           spawnSync("wl-copy", ["--", text], { timeout: 500 });
-          // Small delay for clipboard to propagate
           await new Promise((r) => setTimeout(r, 100));
-          // ydotool 0.1.x uses key names, 1.0.x uses raw keycodes
+
+          // --repeat 1 --delay 0 prevents key auto-repeat
           const legacyYdotool = this._isYdotoolLegacy();
           const keyArgs = legacyYdotool
-            ? ["key", "ctrl+shift+v"]
+            ? ["key", "--delay", "0", "--repeat", "1", "ctrl+shift+v"]
             : ["key", "29:1", "42:1", "47:1", "47:0", "42:0", "29:0"];
-          await new Promise((resolve, reject) => {
-            const proc = spawn("ydotool", keyArgs);
-            let timedOut = false;
-            const tid = setTimeout(() => { timedOut = true; proc.kill("SIGKILL"); }, 3000);
-            proc.on("close", (code) => {
-              clearTimeout(tid);
-              if (timedOut) return reject(new Error("ydotool key timed out"));
-              code === 0 ? resolve() : reject(new Error(`ydotool key exit ${code}`));
-            });
-            proc.on("error", (err) => { clearTimeout(tid); reject(err); });
-          });
+          spawnSync("ydotool", keyArgs, { timeout: 3000 });
+
+          // Wait for paste to complete, then restore clipboard
+          await new Promise((r) => setTimeout(r, 500));
+          try {
+            if (clipboardWasText && savedClipboardText !== null) {
+              spawnSync("wl-copy", ["--", savedClipboardText], { timeout: 500 });
+            } else if (!clipboardWasText) {
+              // Clipboard had non-text (image etc) — can't restore via wl-copy args,
+              // just clear so user doesn't get stale transcription text
+              spawnSync("wl-copy", ["-c"], { timeout: 500 });
+            }
+          } catch {}
+          this.safeLog("📋 Clipboard restored");
+
           method = "ydotool-paste";
           this.safeLog("✅ Paste operation complete", { platform, method, elapsedMs: Date.now() - startTime, textLength: text.length });
           return { success: true, method, text };

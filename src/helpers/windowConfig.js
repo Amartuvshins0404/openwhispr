@@ -14,8 +14,8 @@ const MAIN_OVERLAY_TYPE =
   process.platform === "darwin"
     ? "panel"
     : process.platform === "linux"
-      ? isGnomeWayland || isKDEWayland
-        ? "normal"
+      ? isGnomeWayland
+        ? undefined  // no type = no server-side decorations on GNOME Wayland
         : "toolbar"
       : "normal";
 
@@ -29,8 +29,8 @@ const FLOATING_OVERLAY_TYPE =
       : "normal";
 
 const WINDOW_SIZES = {
-  BASE: { width: 96, height: 96 },
-  WITH_MENU: { width: 240, height: 280 },
+  BASE: { width: 300, height: 56 },
+  WITH_MENU: { width: 300, height: 280 },
   WITH_TOAST: { width: 400, height: 500 },
   EXPANDED: { width: 400, height: 500 },
 };
@@ -47,17 +47,18 @@ const MAIN_WINDOW_CONFIG = {
     sandbox: true,
   },
   frame: false,
+  titleBarStyle: "hidden",
   alwaysOnTop: true,
   resizable: false,
   transparent: true,
   show: false,
   skipTaskbar: true,
-  focusable: true,
+  focusable: false,
   visibleOnAllWorkspaces: process.platform !== "win32",
   fullScreenable: false,
   hasShadow: false,
   acceptsFirstMouse: true,
-  type: MAIN_OVERLAY_TYPE,
+  ...(MAIN_OVERLAY_TYPE ? { type: MAIN_OVERLAY_TYPE } : {}),
 };
 
 // Control panel window configuration
