@@ -159,6 +159,19 @@
           "descriptionKey": "models.descriptions.transcription.mistral_voxtral_mini_latest"
         }
       ]
+    },
+    {
+      "id": "chimege",
+      "name": "Chimege",
+      "baseUrl": "https://api.chimege.com/v1.2",
+      "models": [
+        {
+          "id": "chimege-stt",
+          "name": "Chimege STT",
+          "description": "Mongolian speech recognition (97% accuracy)",
+          "descriptionKey": "models.descriptions.transcription.chimege_stt"
+        }
+      ]
     }
   ],
   "cloudProviders": [

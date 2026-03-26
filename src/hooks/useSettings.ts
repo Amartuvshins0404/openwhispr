@@ -47,6 +47,7 @@ export interface ApiKeySettings {
   geminiApiKey: string;
   groqApiKey: string;
   mistralApiKey: string;
+  chimegeApiKey: string;
   customTranscriptionApiKey: string;
   customReasoningApiKey: string;
 }
@@ -189,6 +190,7 @@ function useSettingsInternal() {
     geminiApiKey: store.geminiApiKey,
     groqApiKey: store.groqApiKey,
     mistralApiKey: store.mistralApiKey,
+    chimegeApiKey: store.chimegeApiKey,
     dictationKey: store.dictationKey,
     meetingKey: store.meetingKey,
     theme: store.theme,
@@ -216,6 +218,7 @@ function useSettingsInternal() {
     setGeminiApiKey: store.setGeminiApiKey,
     setGroqApiKey: store.setGroqApiKey,
     setMistralApiKey: store.setMistralApiKey,
+    setChimegeApiKey: store.setChimegeApiKey,
     customTranscriptionApiKey: store.customTranscriptionApiKey,
     setCustomTranscriptionApiKey: store.setCustomTranscriptionApiKey,
     customReasoningApiKey: store.customReasoningApiKey,

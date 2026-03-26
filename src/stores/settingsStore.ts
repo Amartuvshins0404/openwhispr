@@ -132,6 +132,7 @@ export interface SettingsState
   setGeminiApiKey: (key: string) => void;
   setGroqApiKey: (key: string) => void;
   setMistralApiKey: (key: string) => void;
+  setChimegeApiKey: (key: string) => void;
   setCustomTranscriptionApiKey: (key: string) => void;
   setCustomReasoningApiKey: (key: string) => void;
 
@@ -255,6 +256,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
   geminiApiKey: readString("geminiApiKey", ""),
   groqApiKey: readString("groqApiKey", ""),
   mistralApiKey: readString("mistralApiKey", ""),
+  chimegeApiKey: readString("chimegeApiKey", ""),
   customTranscriptionApiKey: readString("customTranscriptionApiKey", ""),
   customReasoningApiKey: readString("customReasoningApiKey", ""),
 
@@ -396,6 +398,12 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
     set({ mistralApiKey: key });
     window.electronAPI?.saveMistralKey?.(key);
     invalidateApiKeyCaches("mistral");
+  },
+  setChimegeApiKey: (key: string) => {
+    if (isBrowser) localStorage.setItem("chimegeApiKey", key);
+    set({ chimegeApiKey: key });
+    window.electronAPI?.saveChimegeKey?.(key);
+    invalidateApiKeyCaches("chimege");
   },
   setCustomTranscriptionApiKey: (key: string) => {
     if (isBrowser) localStorage.setItem("customTranscriptionApiKey", key);
@@ -600,6 +608,7 @@ export const useSettingsStore = create<SettingsState>()((set, get) => ({
     if (keys.geminiApiKey !== undefined) s.setGeminiApiKey(keys.geminiApiKey);
     if (keys.groqApiKey !== undefined) s.setGroqApiKey(keys.groqApiKey);
     if (keys.mistralApiKey !== undefined) s.setMistralApiKey(keys.mistralApiKey);
+    if (keys.chimegeApiKey !== undefined) s.setChimegeApiKey(keys.chimegeApiKey);
     if (keys.customTranscriptionApiKey !== undefined)
       s.setCustomTranscriptionApiKey(keys.customTranscriptionApiKey);
     if (keys.customReasoningApiKey !== undefined)
@@ -685,6 +694,10 @@ export async function initializeSettings(): Promise<void> {
       if (!state.mistralApiKey) {
         const envKey = await window.electronAPI.getMistralKey?.();
         if (envKey) createStringSetter("mistralApiKey")(envKey);
+      }
+      if (!state.chimegeApiKey) {
+        const envKey = await window.electronAPI.getChimegeKey?.();
+        if (envKey) createStringSetter("chimegeApiKey")(envKey);
       }
       if (!state.customTranscriptionApiKey) {
         const envKey = await window.electronAPI.getCustomTranscriptionKey?.();

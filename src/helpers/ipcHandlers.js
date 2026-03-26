@@ -1562,6 +1562,42 @@ class IPCHandlers {
       return this.environmentManager.saveMistralKey(key);
     });
 
+    ipcMain.handle("get-chimege-key", async () => {
+      return this.environmentManager.getChimegeKey();
+    });
+
+    ipcMain.handle("save-chimege-key", async (event, key) => {
+      return this.environmentManager.saveChimegeKey(key);
+    });
+
+    ipcMain.handle(
+      "proxy-chimege-transcription",
+      async (event, { audioBuffer }) => {
+        const apiKey = this.environmentManager.getChimegeKey();
+        if (!apiKey) {
+          throw new Error("Chimege API key not configured");
+        }
+
+        const response = await fetch("https://api.chimege.com/v1.2/transcribe", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/octet-stream",
+            Token: apiKey,
+            Punctuate: "true",
+          },
+          body: Buffer.from(audioBuffer),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Chimege API Error: ${response.status} ${errorText}`);
+        }
+
+        const text = await response.text();
+        return { text };
+      }
+    );
+
     ipcMain.handle(
       "proxy-mistral-transcription",
       async (event, { audioBuffer, model, language, contextBias }) => {

@@ -109,6 +109,14 @@ class EnvironmentManager {
     return this._saveKey("MISTRAL_API_KEY", key);
   }
 
+  getChimegeKey() {
+    return this._getKey("CHIMEGE_API_KEY");
+  }
+
+  saveChimegeKey(key) {
+    return this._saveKey("CHIMEGE_API_KEY", key);
+  }
+
   getCustomTranscriptionKey() {
     return this._getKey("CUSTOM_TRANSCRIPTION_API_KEY");
   }

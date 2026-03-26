@@ -300,6 +300,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
   saveMistralKey: (key) => ipcRenderer.invoke("save-mistral-key", key),
   proxyMistralTranscription: (data) => ipcRenderer.invoke("proxy-mistral-transcription", data),
 
+  // Chimege API
+  getChimegeKey: () => ipcRenderer.invoke("get-chimege-key"),
+  saveChimegeKey: (key) => ipcRenderer.invoke("save-chimege-key", key),
+  proxyChimegeTranscription: (data) => ipcRenderer.invoke("proxy-chimege-transcription", data),
+
   // Custom endpoint API keys
   getCustomTranscriptionKey: () => ipcRenderer.invoke("get-custom-transcription-key"),
   saveCustomTranscriptionKey: (key) => ipcRenderer.invoke("save-custom-transcription-key", key),

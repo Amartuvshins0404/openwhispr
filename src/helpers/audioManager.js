@@ -776,6 +776,14 @@ registerProcessor("pcm-streaming-processor", PCMStreamingProcessor);
       if (!apiKey) {
         apiKey = null;
       }
+    } else if (provider === "chimege") {
+      apiKey = s.chimegeApiKey;
+      if (!isValidApiKey(apiKey, "chimege")) {
+        apiKey = await window.electronAPI.getChimegeKey?.();
+      }
+      if (!isValidApiKey(apiKey, "chimege")) {
+        throw new Error("Chimege API key not found. Please set your API key in the Control Panel.");
+      }
     } else if (provider === "mistral") {
       // Prefer store value (user-entered via UI) over main process (.env)
       // to avoid stale keys in process.env after auth mode transitions
@@ -1395,6 +1403,26 @@ registerProcessor("pcm-streaming-processor", PCMStreamingProcessor);
           !endpoint.includes("api.mistral.ai"));
 
       const apiCallStart = performance.now();
+
+      // Chimege uses Token header and raw binary body — proxy through main process
+      if (provider === "chimege" && window.electronAPI?.proxyChimegeTranscription) {
+        const audioBuffer = await optimizedAudio.arrayBuffer();
+        const result = await window.electronAPI.proxyChimegeTranscription({ audioBuffer });
+        const proxyText = result?.text;
+
+        if (proxyText && proxyText.trim().length > 0) {
+          timings.transcriptionProcessingDurationMs = Math.round(performance.now() - apiCallStart);
+          const rawText = proxyText;
+          const reasoningStart = performance.now();
+          const text = await this.processTranscription(proxyText, "chimege");
+          timings.reasoningProcessingDurationMs = Math.round(performance.now() - reasoningStart);
+
+          const source = (await this.isReasoningAvailable()) ? "chimege-reasoned" : "chimege";
+          return { success: true, text, rawText, source, timings };
+        }
+
+        throw new Error("No text transcribed - Chimege response was empty");
+      }
 
       // Mistral uses x-api-key auth (not Bearer) and doesn't allow browser CORS — proxy through main process
       if (provider === "mistral" && window.electronAPI?.proxyMistralTranscription) {

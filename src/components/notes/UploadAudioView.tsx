@@ -116,6 +116,8 @@ export default function UploadAudioView({ onNoteCreated, onOpenSettings }: Uploa
     setGroqApiKey,
     mistralApiKey,
     setMistralApiKey,
+    chimegeApiKey,
+    setChimegeApiKey,
     customTranscriptionApiKey,
     setCustomTranscriptionApiKey,
     updateTranscriptionSettings,
@@ -532,6 +534,8 @@ export default function UploadAudioView({ onNoteCreated, onOpenSettings }: Uploa
         setGroqApiKey={setGroqApiKey}
         mistralApiKey={mistralApiKey}
         setMistralApiKey={setMistralApiKey}
+        chimegeApiKey={chimegeApiKey}
+        setChimegeApiKey={setChimegeApiKey}
         customTranscriptionApiKey={customTranscriptionApiKey}
         setCustomTranscriptionApiKey={setCustomTranscriptionApiKey}
         cloudTranscriptionBaseUrl={cloudTranscriptionBaseUrl}

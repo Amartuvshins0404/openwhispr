@@ -174,6 +174,8 @@ interface TranscriptionSectionProps {
   setGroqApiKey: (key: string) => void;
   mistralApiKey: string;
   setMistralApiKey: (key: string) => void;
+  chimegeApiKey: string;
+  setChimegeApiKey: (key: string) => void;
   customTranscriptionApiKey: string;
   setCustomTranscriptionApiKey: (key: string) => void;
   cloudTranscriptionBaseUrl?: string;
@@ -209,6 +211,8 @@ function TranscriptionSection({
   setGroqApiKey,
   mistralApiKey,
   setMistralApiKey,
+  chimegeApiKey,
+  setChimegeApiKey,
   customTranscriptionApiKey,
   setCustomTranscriptionApiKey,
   cloudTranscriptionBaseUrl,
@@ -385,6 +389,8 @@ function TranscriptionSection({
           setGroqApiKey={setGroqApiKey}
           mistralApiKey={mistralApiKey}
           setMistralApiKey={setMistralApiKey}
+          chimegeApiKey={chimegeApiKey}
+          setChimegeApiKey={setChimegeApiKey}
           customTranscriptionApiKey={customTranscriptionApiKey}
           setCustomTranscriptionApiKey={setCustomTranscriptionApiKey}
           cloudTranscriptionBaseUrl={cloudTranscriptionBaseUrl}
@@ -654,6 +660,7 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
     geminiApiKey,
     groqApiKey,
     mistralApiKey,
+    chimegeApiKey,
     dictationKey,
     activationMode,
     setActivationMode,
@@ -678,6 +685,7 @@ export default function SettingsPage({ activeSection = "general" }: SettingsPage
     setGeminiApiKey,
     setGroqApiKey,
     setMistralApiKey,
+    setChimegeApiKey,
     customTranscriptionApiKey,
     setCustomTranscriptionApiKey,
     customReasoningApiKey,
@@ -2875,6 +2883,8 @@ EOF`,
             setGroqApiKey={setGroqApiKey}
             mistralApiKey={mistralApiKey}
             setMistralApiKey={setMistralApiKey}
+            chimegeApiKey={chimegeApiKey}
+            setChimegeApiKey={setChimegeApiKey}
             customTranscriptionApiKey={customTranscriptionApiKey}
             setCustomTranscriptionApiKey={setCustomTranscriptionApiKey}
             cloudTranscriptionBaseUrl={cloudTranscriptionBaseUrl}

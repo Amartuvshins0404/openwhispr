@@ -697,6 +697,13 @@ declare global {
         contextBias?: string[];
       }) => Promise<{ text: string }>;
 
+      // Chimege API key management
+      getChimegeKey: () => Promise<string | null>;
+      saveChimegeKey: (key: string) => Promise<void>;
+      proxyChimegeTranscription: (data: {
+        audioBuffer: ArrayBuffer;
+      }) => Promise<{ text: string }>;
+
       // Custom endpoint API keys
       getCustomTranscriptionKey?: () => Promise<string | null>;
       saveCustomTranscriptionKey?: (key: string) => Promise<void>;
