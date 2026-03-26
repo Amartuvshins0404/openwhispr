@@ -132,6 +132,7 @@ class GnomeShortcutManager {
       }
 
       Toggle() {
+        debugLogger.log("[GnomeShortcut] Toggle() called via D-Bus, callback present:", !!this._dictationCallback);
         if (this._dictationCallback) {
           this._dictationCallback();
         }

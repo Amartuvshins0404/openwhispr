@@ -135,7 +135,7 @@ class ClipboardManager {
     if (this.commandExists("wl-copy")) {
       try {
         const isHyprland = !!process.env.HYPRLAND_INSTANCE_SIGNATURE;
-        const result = spawnSync("wl-copy", ["--", text], { timeout: isHyprland ? 50 : 1 });
+        const result = spawnSync("wl-copy", ["--", text], { timeout: isHyprland ? 50 : 200 });
         if (result.status === 0) {
           clipboard.writeText(text);
           return;
@@ -559,6 +559,58 @@ class ClipboardManager {
         );
       }
 
+      // On Linux Wayland, type directly — skip clipboard entirely for speed and compatibility.
+      if (platform === "linux" && this._isWayland()) {
+        const isAsciiOnly = /^[\x00-\x7F]*$/.test(text);
+        const hasYdotool = this.commandExists("ydotool") && this._isYdotoolDaemonRunning();
+
+        if (isAsciiOnly && hasYdotool) {
+          // ASCII: ydotool type directly (fastest, works everywhere including native Wayland)
+          this.safeLog("⚡ Using ydotool type (direct typing, no clipboard)");
+          await new Promise((resolve, reject) => {
+            const proc = spawn("ydotool", ["type", "--", text]);
+            let timedOut = false;
+            const tid = setTimeout(() => { timedOut = true; proc.kill("SIGKILL"); }, 5000);
+            proc.on("close", (code) => {
+              clearTimeout(tid);
+              if (timedOut) return reject(new Error("ydotool type timed out"));
+              code === 0 ? resolve() : reject(new Error(`ydotool type exit ${code}`));
+            });
+            proc.on("error", (err) => { clearTimeout(tid); reject(err); });
+          });
+          method = "ydotool-type";
+          this.safeLog("✅ Paste operation complete", { platform, method, elapsedMs: Date.now() - startTime, textLength: text.length });
+          return { success: true, method, text };
+        }
+
+        if (!isAsciiOnly && hasYdotool && this.commandExists("wl-copy")) {
+          // Non-ASCII (Cyrillic, CJK): wl-copy to clipboard, then ydotool Ctrl+Shift+V (terminal paste)
+          this.safeLog("⚡ Using wl-copy + ydotool paste (non-ASCII)");
+          spawnSync("wl-copy", ["--", text], { timeout: 500 });
+          // Small delay for clipboard to propagate
+          await new Promise((r) => setTimeout(r, 100));
+          // ydotool 0.1.x uses key names, 1.0.x uses raw keycodes
+          const legacyYdotool = this._isYdotoolLegacy();
+          const keyArgs = legacyYdotool
+            ? ["key", "ctrl+shift+v"]
+            : ["key", "29:1", "42:1", "47:1", "47:0", "42:0", "29:0"];
+          await new Promise((resolve, reject) => {
+            const proc = spawn("ydotool", keyArgs);
+            let timedOut = false;
+            const tid = setTimeout(() => { timedOut = true; proc.kill("SIGKILL"); }, 3000);
+            proc.on("close", (code) => {
+              clearTimeout(tid);
+              if (timedOut) return reject(new Error("ydotool key timed out"));
+              code === 0 ? resolve() : reject(new Error(`ydotool key exit ${code}`));
+            });
+            proc.on("error", (err) => { clearTimeout(tid); reject(err); });
+          });
+          method = "ydotool-paste";
+          this.safeLog("✅ Paste operation complete", { platform, method, elapsedMs: Date.now() - startTime, textLength: text.length });
+          return { success: true, method, text };
+        }
+      }
+
       if (platform === "linux" && this._isWayland()) {
         this._writeClipboardWayland(text, webContents);
       } else {
@@ -597,7 +649,7 @@ class ClipboardManager {
         }
         await this.pasteWindows(originalClipboard);
       } else {
-        method = (await this.pasteLinux(originalClipboard, options)) || "linux-tools";
+        method = (await this.pasteLinux(originalClipboard, options, text)) || "linux-tools";
       }
 
       this.safeLog("✅ Paste operation complete", {
@@ -996,7 +1048,7 @@ class ClipboardManager {
     });
   }
 
-  async pasteLinux(originalClipboard, options = {}) {
+  async pasteLinux(originalClipboard, options = {}, text = null) {
     const { isWayland, xwaylandAvailable, isGnome, isKde, isWlroots } = getLinuxSessionInfo();
     const webContents = options.webContents;
     const xdotoolExists = this.commandExists("xdotool");
@@ -1169,6 +1221,36 @@ class ClipboardManager {
           for (let attempt = 0; attempt < MAX_PORTAL_RETRIES; attempt++) {
             try {
               const portalResult = await this._runPortalPaste(linuxFastPaste, earlyIsTerminal);
+              // Verify the paste was consumed: if clipboard still contains our text
+              // after a short delay, the target app may have ignored Ctrl+V (e.g. Claude Code).
+              // Fall through to ydotool type in that case (ASCII only — ydotool can't type Cyrillic/CJK).
+              const textIsAscii = text && /^[\x00-\x7F]*$/.test(text);
+              if (textIsAscii && ydotoolDaemonRunning) {
+                await new Promise((r) => setTimeout(r, 150));
+                const currentClipboard = clipboard.readText();
+                if (currentClipboard === text) {
+                  this.safeLog("⚠️ Portal Ctrl+V may not have been consumed, trying ydotool type...");
+                  try {
+                    await new Promise((resolve, reject) => {
+                      const proc = spawn("ydotool", ["type", "--", text]);
+                      let timedOut = false;
+                      const tid = setTimeout(() => { timedOut = true; proc.kill("SIGKILL"); }, 3000);
+                      proc.on("close", (code) => {
+                        clearTimeout(tid);
+                        if (timedOut) return reject(new Error("ydotool type timed out"));
+                        code === 0 ? resolve() : reject(new Error(`ydotool type exit ${code}`));
+                      });
+                      proc.on("error", (err) => { clearTimeout(tid); reject(err); });
+                    });
+                    this.safeLog("✅ Paste successful using ydotool type (direct typing)");
+                    debugLogger.info("Paste successful", { tool: "ydotool-type", method: "direct" }, "clipboard");
+                    restoreClipboard();
+                    return "ydotool-type";
+                  } catch (typeErr) {
+                    this.safeLog("⚠️ ydotool type fallback failed:", typeErr?.message);
+                  }
+                }
+              }
               this.safeLog("✅ Paste successful using linux-fast-paste --portal (RemoteDesktop)");
               debugLogger.info(
                 "Paste successful",

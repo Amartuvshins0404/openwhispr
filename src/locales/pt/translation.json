@@ -72,7 +72,8 @@
       "osReserved": "\"{{hotkey}}\" pode estar reservada pelo seu ambiente de desktop.",
       "registrationFailed": "Não foi possível registrar \"{{hotkey}}\". Pode estar em uso por outro aplicativo.",
       "trySuggestions": "Tente: {{suggestions}}",
-      "slotConflict": "Este atalho já está sendo usado para {{slot}}."
+      "slotConflict": "Este atalho já está sendo usado para {{slot}}.",
+      "modifierOnlyNotSupported": "\"{{hotkey}}\" usa apenas teclas modificadoras, o que não é suportado nesta plataforma. Adicione uma tecla regular (ex. Control+Shift+Space)."
     }
   },
   "systemSettings": {

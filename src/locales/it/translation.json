@@ -72,7 +72,8 @@
       "osReserved": "\"{{hotkey}}\" potrebbe essere riservata dal sistema operativo.",
       "registrationFailed": "Impossibile registrare \"{{hotkey}}\". Potrebbe essere in uso da un'altra applicazione.",
       "trySuggestions": "Prova: {{suggestions}}",
-      "slotConflict": "Questa scorciatoia è già utilizzata per {{slot}}."
+      "slotConflict": "Questa scorciatoia è già utilizzata per {{slot}}.",
+      "modifierOnlyNotSupported": "\"{{hotkey}}\" usa solo tasti modificatori, non supportato su questa piattaforma. Aggiungi un tasto normale (es. Control+Shift+Space)."
     }
   },
   "systemSettings": {

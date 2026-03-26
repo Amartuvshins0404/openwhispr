@@ -61,7 +61,7 @@ const SUGGESTED_HOTKEYS = {
 class HotkeyManager {
   constructor() {
     this.slots = new Map();
-    const defaultDictation = process.platform === "darwin" ? "GLOBE" : "Control+Super";
+    const defaultDictation = process.platform === "darwin" ? "GLOBE" : "Control+Shift+Space";
     this.slots.set("dictation", { hotkey: defaultDictation, callback: null, accelerator: null });
     this.isInitialized = false;
     this.isListeningMode = false;
@@ -139,7 +139,7 @@ class HotkeyManager {
     } else if (process.platform === "win32" && isCompound) {
       suggestions = ["Control+Super", "Control+Alt", "Control+Shift+K"];
     } else if (process.platform === "linux" && isCompound) {
-      suggestions = ["Control+Super", "Control+Shift+K", "Super+Shift+R"];
+      suggestions = ["Control+Shift+K", "Control+Shift+Space", "Alt+F7"];
     }
 
     return suggestions.filter((s) => s !== failedHotkey).slice(0, 3);
@@ -271,7 +271,7 @@ class HotkeyManager {
     return this.slots.get(slotName)?.hotkey ?? null;
   }
 
-  setupShortcuts(hotkey = "Control+Super", callback, slotName = "dictation") {
+  setupShortcuts(hotkey = "Control+Shift+Space", callback, slotName = "dictation") {
     if (!callback) {
       throw new Error(i18nMain.t("hotkey.errors.callbackRequired"));
     }
@@ -344,13 +344,23 @@ class HotkeyManager {
         return { success: true, hotkey };
       }
 
-      if (isModifierOnlyHotkey(hotkey) && process.platform === "win32") {
-        slot.hotkey = hotkey;
-        slot.accelerator = null;
+      if (isModifierOnlyHotkey(hotkey)) {
+        if (process.platform === "win32") {
+          slot.hotkey = hotkey;
+          slot.accelerator = null;
+          debugLogger.log(
+            `[HotkeyManager] Modifier-only "${hotkey}" set - using Windows native listener`
+          );
+          return { success: true, hotkey };
+        }
         debugLogger.log(
-          `[HotkeyManager] Modifier-only "${hotkey}" set - using Windows native listener`
+          `[HotkeyManager] Modifier-only "${hotkey}" rejected on ${process.platform} - no native listener`
         );
-        return { success: true, hotkey };
+        return {
+          success: false,
+          error: i18nMain.t("hotkey.errors.modifierOnlyNotSupported", { hotkey }),
+          suggestions: this.getSuggestions(hotkey),
+        };
       }
 
       const accelerator = normalizeToAccelerator(hotkey);
@@ -568,7 +578,7 @@ class HotkeyManager {
             const savedHotkey = await mainWindow.webContents.executeJavaScript(`
               localStorage.getItem("dictationKey") || ""
             `);
-            const hotkey = savedHotkey && savedHotkey.trim() !== "" ? savedHotkey : "Control+Super";
+            const hotkey = savedHotkey && savedHotkey.trim() !== "" ? savedHotkey : "Control+Shift+Space";
             const gnomeHotkey = GnomeShortcutManager.convertToGnomeFormat(hotkey);
 
             const success = await this.gnomeManager.registerKeybinding(gnomeHotkey);
@@ -604,7 +614,7 @@ class HotkeyManager {
             const savedHotkey = await mainWindow.webContents.executeJavaScript(`
               localStorage.getItem("dictationKey") || ""
             `);
-            const hotkey = savedHotkey && savedHotkey.trim() !== "" ? savedHotkey : "Control+Super";
+            const hotkey = savedHotkey && savedHotkey.trim() !== "" ? savedHotkey : "Control+Shift+Space";
             const success = await this.kdeManager.registerKeybinding(hotkey, "dictation", callback);
             if (success) {
               this.currentHotkey = hotkey;
@@ -644,7 +654,7 @@ class HotkeyManager {
             const savedHotkey = await mainWindow.webContents.executeJavaScript(`
               localStorage.getItem("dictationKey") || ""
             `);
-            const hotkey = savedHotkey && savedHotkey.trim() !== "" ? savedHotkey : "Control+Super";
+            const hotkey = savedHotkey && savedHotkey.trim() !== "" ? savedHotkey : "Control+Shift+Space";
 
             const success = await this.hyprlandManager.registerKeybinding(hotkey);
             if (success) {
@@ -716,7 +726,7 @@ class HotkeyManager {
         this.notifyHotkeyFailure(savedHotkey, result);
       }
 
-      const defaultHotkey = process.platform === "darwin" ? "GLOBE" : "Control+Super";
+      const defaultHotkey = process.platform === "darwin" ? "GLOBE" : "Control+Shift+Space";
 
       if (defaultHotkey === "GLOBE") {
         this.currentHotkey = "GLOBE";

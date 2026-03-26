@@ -72,7 +72,8 @@
       "osReserved": "\"{{hotkey}}\" 可能被你的作業系統保留。",
       "registrationFailed": "無法註冊「{{hotkey}}」。可能已被其他應用程式使用。",
       "trySuggestions": "試試看：{{suggestions}}",
-      "slotConflict": "此快捷鍵已用於{{slot}}。"
+      "slotConflict": "此快捷鍵已用於{{slot}}。",
+      "modifierOnlyNotSupported": "「{{hotkey}}」僅使用修飾鍵，此平台不支援。請新增一個普通按鍵（例如 Control+Shift+Space）。"
     }
   },
   "systemSettings": {

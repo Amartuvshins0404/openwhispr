@@ -72,7 +72,8 @@
       "osReserved": "\"{{hotkey}}\" may be reserved by your desktop environment.",
       "registrationFailed": "Could not register \"{{hotkey}}\". It may be in use by another application.",
       "trySuggestions": "Try: {{suggestions}}",
-      "slotConflict": "This hotkey is already used for {{slot}}."
+      "slotConflict": "This hotkey is already used for {{slot}}.",
+      "modifierOnlyNotSupported": "\"{{hotkey}}\" uses only modifier keys, which is not supported on this platform. Add a regular key (e.g. Control+Shift+Space)."
     }
   },
   "systemSettings": {
@@ -1455,7 +1456,8 @@
         "openai_whisper_1": "Original Whisper model",
         "groq_whisper_large_v3": "High accuracy speech recognition",
         "groq_whisper_large_v3_turbo": "216x real-time speed",
-        "mistral_voxtral_mini_latest": "Fast multilingual transcription"
+        "mistral_voxtral_mini_latest": "Fast multilingual transcription",
+        "chimege_stt": "Mongolian speech recognition (97% accuracy)"
       },
       "cloud": {
         "openai_gpt_5_4": "Frontier model for complex reasoning",

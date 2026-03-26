@@ -72,7 +72,8 @@
       "osReserved": "\"{{hotkey}}\" peut être réservé par votre environnement de bureau.",
       "registrationFailed": "Impossible d'enregistrer \"{{hotkey}}\". Il est peut-être utilisé par une autre application.",
       "trySuggestions": "Essayez : {{suggestions}}",
-      "slotConflict": "Ce raccourci est déjà utilisé pour {{slot}}."
+      "slotConflict": "Ce raccourci est déjà utilisé pour {{slot}}.",
+      "modifierOnlyNotSupported": "\"{{hotkey}}\" n'utilise que des touches de modification, ce qui n'est pas pris en charge sur cette plateforme. Ajoutez une touche normale (ex. Control+Shift+Space)."
     }
   },
   "systemSettings": {
